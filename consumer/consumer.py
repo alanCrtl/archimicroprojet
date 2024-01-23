@@ -1,10 +1,7 @@
 from confluent_kafka import Consumer, KafkaError
 import psycopg2
 from psycopg2 import sql
-import requests
-import httpx
-"""
-"""
+
 class Coord:
     def __init__(self, lat, long, ip, date) -> None:
         self.lat: float = lat
@@ -16,7 +13,7 @@ def connect_to_db():
     dbname = "coords"
     user = "root"
     password = "password"
-    host = "localhost"
+    host = "postgres"
     port = "5432"
     connection = psycopg2.connect(dbname=dbname, user=user, password=password, host=host, port=port)
     return connection
@@ -57,6 +54,7 @@ def clear_db():
     
 # ==== main functions ====
 def consume_messages(bootstrap_servers, group_id, topic):
+
     consumer_conf = {
         'bootstrap.servers': bootstrap_servers,
         'group.id': group_id,
@@ -69,9 +67,10 @@ def consume_messages(bootstrap_servers, group_id, topic):
     max_iterations_without_messages = 5
     iterations_without_messages = 0
 
-    # start of clean sheets
-    clear_db()
-
+    # start off clean sheets
+    res = clear_db()
+    print(res)
+    
     print(f'bootstrapped the consumer to broker and topic [{topic}]; waiting for messages...')
     try:
         while True:
@@ -119,7 +118,8 @@ def consume_messages(bootstrap_servers, group_id, topic):
         consumer.close()
 
 if __name__ == '__main__':
-    bootstrap_servers = 'localhost:9092'  # Kafka broker's address
+    print('hello from consumer')
+    bootstrap_servers = 'kafka:9092'  # Kafka broker's address
     group_id = 'my-consumer-group'
     topic = 'coordinates'
     consume_messages(bootstrap_servers, group_id, topic)

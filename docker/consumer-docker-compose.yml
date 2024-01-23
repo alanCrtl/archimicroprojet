@@ -1,33 +1,18 @@
 version: '3'
-
 services:
-  api:
-    build: ./api
-    image: kafka_api
-    container_name: kafka_api_container
-    ports:
-        - "3001:3001"
-    volumes:
-        - ./api:/app
-    command: npm start
-    depends_on:
-        - postgres
-    networks:
-      - archimicroprojet_kafka_net
-
-  kafka-consumer:
+  consumer:
     build:
-      context: ./backend/consumer
+      context: ../consumer
+      dockerfile: Dockerfile
     environment:
-      KAFKA_BROKER: kafka-broker:9092
-      POSTGRES_HOST: postgres
-      POSTGRES_PORT: 5432
+      POSTGRES_DB: coords
       POSTGRES_USER: root
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: coordonnee
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
     networks:
-      - archimicroprojet_kafka_net
+      - kafkaproj
 
 networks:
-  archimicroprojet_kafka_net:
-    external: true
+  kafkaproj:
+    driver: bridge

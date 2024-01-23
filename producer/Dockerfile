@@ -1,12 +1,11 @@
-FROM python:3.11
+FROM python:3.9
 
 WORKDIR /app
 
-COPY requirements.txt .
+COPY . .
+
+RUN ls
 
 RUN pip install -r requirements.txt
 
-COPY . .
-
-# Exécute le producer
-CMD ["python", "producer.py"]
+CMD ["python3", "./producer.py"]

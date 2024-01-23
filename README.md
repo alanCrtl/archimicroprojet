@@ -1,8 +1,11 @@
 # archi micro projet
 
+## NOTES
+
 ## TODO 
 
 Dockerize everything
+lat / long inverted in bdd (it's long / lat)
 testapi.py api working
 kafka working
 bdd postgresql working
@@ -12,6 +15,42 @@ consumer and producer working
 ## Schema of structure
 
 ![AltText](schema.jpg)
+
+## Docker 
+
+### Run the postgreSQL db
+```
+docker-compose -f bdd-docker-compose.yml up -d
+```
+
+### Run the consumer docker-compose
+```
+docker-compose -f docker-compose-consumer.yml up --build
+```
+
+### Run the producer docker-compose
+```
+docker-compose -f producer-docker-compose.yml up --build
+```
+
+### useful docker commands
+*show containers*
+```
+docker ps
+```
+*restart service*
+```
+sudo service docker restart
+
+```
+*Stop a container (example)*
+```
+docker compose -f bdd-docker-compose.yml down
+```
+*reset networks*
+```
+docker network prune
+```
 
 ## Kafka
 
@@ -94,22 +133,15 @@ your name.
 
 ### run api manually
 ```
-uvicorn app:app --reload
+uvicorn api:app --reload
 ```
 
-## Docker 
+# AUTEURS 
 
-### Run the docker-compose (postgres, front, kafka)
-```
-docker-compose up
-```
+Aurelien CHAUVEHEID
 
-### Run the producer docker-compose (postgres, front, kafka)
-```
-docker-compose -f producer-docker-compose.yml up
-```
+Alan COURTEL
 
-### Run the consumer docker-compose (postgres, front, kafka)
-```
-docker-compose -f consumer-docker-compose.yml up
-```
+Ameilie LEANG
+
+Marieme SALL

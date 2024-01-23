@@ -1,14 +1,12 @@
 version: '3'
-
 services:
-  kafka-producer:
+  producer:
     build:
-      context: ./backend/producer
-    environment:
-      KAFKA_BROKER: kafka-broker:9092
+      context: ../producer
+      dockerfile: Dockerfile
     networks:
-      - archimicroprojet_kafka_net
+      - kafkaproj
 
 networks:
-  archimicroprojet_kafka_net:
-    external: true
+  kafkaproj:
+    driver: bridge

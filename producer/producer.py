@@ -5,7 +5,7 @@ import hashlib
 from confluent_kafka import Producer
 """
 running this will create test coordinates
-directly to the broker running on local
+directly to the broker
 """
 NUM_PARTITIONS = 2
 
@@ -53,15 +53,14 @@ def produce_messages(bootstrap_servers, topic, num_messages):
         lat, long = 43.321551, -0.359241 # start in Pau
         lat, long = generate_coordinate(lat, long)
         message = generate_message(lat, long)
-        partition = get_machine_partition()
-        # partition = 0
+        partition = get_machine_partition() or 0
         producer.produce(topic, value=message, partition=partition, callback=delivery_report)
-        time.sleep(0.5)
+        time.sleep(1)
 
     producer.flush()
 
 if __name__ == '__main__':
-    bootstrap_servers = 'localhost:9092'  # Kafka broker's address
+    bootstrap_servers = 'kafka:9092'  # Kafka broker's address
     topic = 'coordinates'
-    num_messages = 10
+    num_messages = 30
     produce_messages(bootstrap_servers, topic, num_messages)

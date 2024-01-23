@@ -1,2 +1,1 @@
-confluent-kafka
-psycopg2-binary
+confluent_kafka==2.3.0
