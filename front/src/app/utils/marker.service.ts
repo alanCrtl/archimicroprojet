@@ -10,30 +10,37 @@ import { Point } from "./model/point";
 export class MarkerService {
   capitals: string = 'assets/data/usa-capitals.geojson'
   data_p1: string = 'assets/data/coordonnes.json'
+  marker?: L.Marker;
+  line?: L.Polyline;
   constructor(private http: HttpClient, private popUpService: PopupService) { }
 
   makeMarkers(map: L.Map, point:Point) {
     const lon = point.longitude;
     const lat = point.latitude;
-    const marker = L.marker([lon, lat]);
+    if(this.marker){
+      map.removeLayer(this.marker)
+    }
+    this.marker = L.marker([lon, lat]);
 
-    marker.bindPopup(this.popUpService.makePopUp(point))
+    this.marker.bindPopup(this.popUpService.makePopUp(point))
 
-    marker.addTo(map);
+    this.marker.addTo(map);
   }
 
   makePath(map: L.Map, points: any[]){
-    const polyline = L.polyline(points, {color: 'red', weight: 2, dashArray: '10 10', lineJoin:'round'})
-    polyline.addTo(map)
+    if( this.line) {
+      map.removeLayer(this.line)
+    }
+    this.line = L.polyline(points, {color: 'red', weight: 2, dashArray: '10 10', lineJoin:'round'})
+    this.line.addTo(map)
   }
-  afficherMarkerIP(map: L.Map, ip: string) {
+  afficherMarkerIP(map: L.Map, point:Point) {
     /*
     Requete l'API pour la liste des coordonnées d'un produceur
      */
 
-    this.http.get(this.data_p1).subscribe((res: any) => {
-      console.log(res)
-      this.makeMarkers(map, res[0])
+    this.http.get(`http://localhost:8000/coordonnees/${point.ip}`).subscribe((res: any) => {
+      this.makeMarkers(map, point)
       let points = []
       for(const point of res) {
         points.push([point.longitude, point.latitude])
