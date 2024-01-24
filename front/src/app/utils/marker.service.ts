@@ -10,42 +10,61 @@ import { Point } from "./model/point";
 export class MarkerService {
   capitals: string = 'assets/data/usa-capitals.geojson'
   data_p1: string = 'assets/data/coordonnes.json'
-  marker?: L.Marker;
-  line?: L.Polyline;
+
+  layers: {marker:L.Marker, path: L.Polyline, point: Point}[] = []
+
   constructor(private http: HttpClient, private popUpService: PopupService) { }
 
-  makeMarkers(map: L.Map, point:Point) {
+  makeMarkers(map: L.Map, point:Point): L.Marker {
     const lon = point.longitude;
     const lat = point.latitude;
-    if(this.marker){
-      map.removeLayer(this.marker)
-    }
-    this.marker = L.marker([lon, lat]);
+    const marker = L.marker([lon, lat]);
 
-    this.marker.bindPopup(this.popUpService.makePopUp(point))
-
-    this.marker.addTo(map);
+    marker.bindPopup(this.popUpService.makePopUp(point))
+    return marker
   }
 
-  makePath(map: L.Map, points: any[]){
-    if( this.line) {
-      map.removeLayer(this.line)
-    }
-    this.line = L.polyline(points, {color: 'red', weight: 2, dashArray: '10 10', lineJoin:'round'})
-    this.line.addTo(map)
+  makePath(map: L.Map, points: any[]): L.Polyline{
+    return L.polyline(points, {color: 'red', weight: 2, dashArray: '10 10', lineJoin:'round'})
   }
   afficherMarkerIP(map: L.Map, point:Point) {
     /*
     Requete l'API pour la liste des coordonnées d'un produceur
      */
+    let exist = false;
+    let index = this.layers.length
+
+    for (let i = 0; i <this.layers.length ; i++) {
+      if( this.layers[i].point.ip===point.ip){
+        exist = true
+        index = i
+      }
+    }
 
     this.http.get(`http://localhost:8000/coordonnees/${point.ip}`).subscribe((res: any) => {
-      this.makeMarkers(map, point)
+      const marker = this.makeMarkers(map, point)
       let points = []
       for(const point of res) {
         points.push([point.longitude, point.latitude])
       }
-      this.makePath(map, points)
+      const path=  this.makePath(map, points)
+
+      if(exist){
+        map.removeLayer(this.layers[index].marker)
+        map.removeLayer(this.layers[index].path)
+        this.layers[index].marker = marker
+        this.layers[index].point = point
+        this.layers[index].path = path
+      } else {
+        this.layers.push({
+          marker,
+          path,
+          point
+        })
+      }
+
+      this.layers[index].marker.addTo(map)
+      this.layers[index].path.addTo(map)
 
     })
   }
