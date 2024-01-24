@@ -1,10 +1,8 @@
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI, WebSocket
 from datetime import datetime
-from api.routeur import router as api_routeur
 from fastapi_sqlalchemy import DBSessionMiddleware, db
 from BDD.models import Coordonnee
 from BDD.schema import Coordonnee  as Model_coordonnee
-
 import os
 from dotenv import load_dotenv
 
@@ -12,12 +10,15 @@ date_format = '%Y-%m-%d %H:%M:%S'
 
 load_dotenv('.env')
 
+ws_connections = []
+
+def get_connections() :
+    return ws_connections 
 
 app = FastAPI()
 
 # to avoid csrftokenError
 app.add_middleware(DBSessionMiddleware, db_url=os.environ['DATABASE_URL'])
-app.include_router(api_routeur)
 
 
 @app.get("/")
@@ -30,8 +31,17 @@ async def get_coordonnees(ip):
     return coor
 
 @app.post('/coordonnees')
-async def add_coordonnees(coor: Model_coordonnee):
-    db_coor = Coordonnee(latitude = coor.latitude, longitude = coor.longitude, ip = coor.ip, date = datetime.strptime("2024-01-17 17:08:0", date_format))
+async def add_coordonnees(coor: Model_coordonnee, connections= Depends(get_connections)):
+    db_coor = Coordonnee(latitude = coor.latitude, longitude = coor.longitude, ip = coor.ip, date = datetime.strptime(coor.date, date_format))
     db.session.add(db_coor)
     db.session.commit()
+    await connections[0].send_json({'latitude': coor.latitude, 'longitude':coor.longitude, 'ip': coor.ip, 'date': coor.date})
     return True
+
+@app.websocket('/ws/{ip}')
+async def websocket_endpoint(websocket: WebSocket, ip:int, connections = Depends(get_connections)):
+    await websocket.accept()
+    connections.append(websocket)
+    while True:
+        data = await websocket.receive_json()
+        await websocket.send_json(data)
