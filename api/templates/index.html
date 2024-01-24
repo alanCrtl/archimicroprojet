@@ -30,7 +30,7 @@
 
         async function fetchDataAndRefreshMap() {
             console.log('FETCHING DATA...');
-            const response = await fetch('http://127.0.0.1:8000/update_location');
+            const response = await fetch('/update_location');
             console.log(response);
             const data = await response.json();
 

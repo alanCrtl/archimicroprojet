@@ -1,4 +1,4 @@
-from confluent_kafka import Consumer, KafkaError
+from kafka import KafkaConsumer
 import psycopg2
 from psycopg2 import sql
 
@@ -24,10 +24,10 @@ def push_to_db(coord: Coord):
     try:
         with connection.cursor() as cursor:
             insert_query = sql.SQL("""
-                INSERT INTO coordonnee (longitude, latitude, date, ip)
+                INSERT INTO coordonnee (lat, long, ip, date)
                 VALUES (%s, %s, %s, %s)
             """)
-            cursor.execute(insert_query, (coord.long, coord.lat, coord.date, coord.ip))
+            cursor.execute(insert_query, (coord.lat, coord.long, coord.ip, coord.date,))
 
         connection.commit()
 
@@ -52,33 +52,47 @@ def clear_db():
     
     return {"status": "All rows cleared from the database"}
     
+def get_column_names():
+    connection = connect_to_db()
+
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT column_name FROM information_schema.columns WHERE table_name = 'coordonnee';")
+            column_names = cursor.fetchall()
+
+        return [column[0] for column in column_names]
+
+    finally:
+        connection.close()
+
+# ==== main functions ====
 # ==== main functions ====
 def consume_messages(bootstrap_servers, group_id, topic):
 
     consumer_conf = {
-        'bootstrap.servers': bootstrap_servers,
-        'group.id': group_id,
-        'auto.offset.reset': 'earliest'
+        'bootstrap_servers': bootstrap_servers,
+        'group_id': group_id,
+        'enable_auto_commit': True
     }
 
-    consumer = Consumer(consumer_conf)
+    consumer = KafkaConsumer(topic, **consumer_conf)
     consumer.subscribe([topic])
     
     max_iterations_without_messages = 5
     iterations_without_messages = 0
 
-    # start off clean sheets
-    res = clear_db()
-    print(res)
-    
-    print(f'bootstrapped the consumer to broker and topic [{topic}]; waiting for messages...')
+    # connect to database and show column names
+    column_names = get_column_names()
+    print("DB Column Names:", column_names)
+
     try:
         while True:
-            msg = consumer.poll(timeout=10)
+            print('waiting for messages...')
+            messages = consumer.poll(timeout_ms=4000)
             
-            # exit after too much idle time
-            if msg is None:
+            if not messages:
                 iterations_without_messages += 1
+                print('No messages received.')
                 if iterations_without_messages > max_iterations_without_messages:
                     print("No messages received for {} iterations. Exiting.".format(max_iterations_without_messages))
                     break
@@ -87,28 +101,11 @@ def consume_messages(bootstrap_servers, group_id, topic):
                 continue
 
             iterations_without_messages = 0  # Reset the count when a message is received
-
-            # error handling
-            if msg.error():
-                if msg.error().code() == KafkaError._PARTITION_EOF:
-                    print("Reached end of partition. Continuing.")
-                    continue
-                else:
-                    print("Error: {}".format(msg.error()))
-                    break
             
-            # parse message
-            print(f'msg received: {msg.value().decode("utf-8")}')
-            splitted_message = msg.value().decode('utf-8').split(';')
-            lat = float(splitted_message[0])
-            long = float(splitted_message[1])
-            ip = splitted_message[2]
-            date = splitted_message[3]
+            for topic_partition, partition_messages in messages.items():
+                for msg in partition_messages:
+                    process_kafka_message(msg)
 
-            # turn it into object and push to DB
-            coord = Coord(lat=lat, long=long, ip=ip, date=date)
-            push_to_db(coord)
-            
     except KeyboardInterrupt:
         print("KeyboardInterrupt")
         pass
@@ -117,9 +114,27 @@ def consume_messages(bootstrap_servers, group_id, topic):
         print("Exiting the consumer.")
         consumer.close()
 
+def process_kafka_message(msg):
+    try:
+        # parse message
+        print(f'msg received: {msg.value.decode("utf-8")}')
+        splitted_message = msg.value.decode('utf-8').split(';')
+        lat = float(splitted_message[0])
+        long = float(splitted_message[1])
+        ip = splitted_message[2]
+        date = splitted_message[3]
+
+        # turn it into object and push to DB
+        coord = Coord(lat=lat, long=long, ip=ip, date=date)
+        print(f'coord : {coord}')
+        push_to_db(coord)
+
+    except Exception as e:
+        print(f"Error processing message: {e}")
+
 if __name__ == '__main__':
     print('hello from consumer')
-    bootstrap_servers = 'kafka:9092'  # Kafka broker's address
+    bootstrap_servers = 'kafka:9093'  # Kafka broker's address
     group_id = 'my-consumer-group'
     topic = 'coordinates'
     consume_messages(bootstrap_servers, group_id, topic)

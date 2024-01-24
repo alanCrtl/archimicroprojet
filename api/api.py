@@ -12,7 +12,7 @@ def connect_to_db():
     dbname = "coords"
     user = "root"
     password = "password"
-    host = "localhost"
+    host = "postgres"
     port = "5432"
     connection = psycopg2.connect(dbname=dbname, user=user, password=password, host=host, port=port)
     return connection
@@ -45,7 +45,7 @@ async def update_location(request: Request):
     coords = retrieve_all_rows()
     geolocation_data = [
                 {"lat": row[1], "long": row[2], "ip": row[3], "date": str(row[4])} for row in coords]
-    print(f'geodata: {geolocation_data}')
+    print(f'last geodata: {geolocation_data[-1]}')
     return {"geolocation_data": geolocation_data}
 
 @app.get("/", response_class=HTMLResponse)
@@ -53,4 +53,4 @@ async def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request, "coords": geolocation_data})
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
