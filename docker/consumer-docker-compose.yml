@@ -12,6 +12,7 @@ services:
       POSTGRES_PORT: 5432
     networks:
       - kafkaproj
+    restart: on-failure
 
 networks:
   kafkaproj:

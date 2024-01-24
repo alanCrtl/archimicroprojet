@@ -6,6 +6,7 @@ services:
       dockerfile: Dockerfile
     networks:
       - kafkaproj
+    restart: on-failure
 
 networks:
   kafkaproj:
