@@ -61,7 +61,7 @@ def produce_messages(bootstrap_servers, topic, num_messages):
     producer.flush()
 
 if __name__ == '__main__':
-    bootstrap_servers = '172.11.0.2:9092'  # docker network inspect archimicroprojet_kafka_net
+    bootstrap_servers = 'kafka:9092'  # docker network inspect archimicroprojet_kafka_net
     topic = 'coordinates'
     num_messages = 10
     produce_messages(bootstrap_servers, topic, num_messages)
