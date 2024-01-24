@@ -2,22 +2,20 @@ version: '3'
 
 services:
   api:
-    build: ./api
+    build: ../api
     image: kafka_api
     container_name: kafka_api_container
     ports:
         - "3001:3001"
     volumes:
-        - ./api:/app
-    command: npm start
-    depends_on:
-        - postgres
+        - ../api:/app
+    command: uvicorn main:app
     networks:
       - archimicroprojet_kafka_net
 
   kafka-consumer:
     build:
-      context: ./backend/consumer
+      context: ./
     environment:
       KAFKA_BROKER: kafka-broker:29092
       POSTGRES_HOST: postgres
