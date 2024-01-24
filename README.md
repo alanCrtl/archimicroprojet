@@ -108,10 +108,12 @@ docker-compose up
 
 ### Run the producer docker-compose (kafka)
 ```
+cd producer
 docker-compose -f producer-docker-compose.yml up
 ```
 
 ### Run the consumer docker-compose (kafka, api)
 ```
+cd consumer
 docker-compose -f consumer-docker-compose.yml up
 ```
