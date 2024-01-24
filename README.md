@@ -83,12 +83,12 @@ your name.
 docker-compose up
 ```
 
-### Run the producer docker-compose (postgres, front, kafka)
+### Run the producer docker-compose (kafka)
 ```
 docker-compose -f producer-docker-compose.yml up
 ```
 
-### Run the consumer docker-compose (postgres, front, kafka)
+### Run the consumer docker-compose (kafka, api)
 ```
 docker-compose -f consumer-docker-compose.yml up
 ```

@@ -19,7 +19,7 @@ services:
     build:
       context: ./backend/consumer
     environment:
-      KAFKA_BROKER: kafka-broker:9092
+      KAFKA_BROKER: kafka-broker:29092
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
       POSTGRES_USER: root
