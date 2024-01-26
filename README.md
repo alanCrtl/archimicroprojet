@@ -66,6 +66,9 @@ docker-compose -f docker-compose-consumer.yml up --build
 docker-compose -f producer-docker-compose.yml up --build
 ```
 
+**Once all services are running you can find the frontend(map) here : http://0.0.0.0:8000**
+
+
 ### useful docker commands for debug
 *show containers*
 ```
