@@ -1,10 +1,9 @@
-from fastapi import FastAPI, Request, Form
-from fastapi.responses import HTMLResponse,JSONResponse
-from fastapi.templating import Jinja2Templates
-from typing import List
 import uvicorn
 import psycopg2
 from psycopg2 import sql
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 
 app = FastAPI()
 
@@ -39,6 +38,7 @@ templates = Jinja2Templates(directory="templates")
 
 geolocation_data = []
 
+# fetches all rows of data from the database (used by the js script in templates/index.html)
 @app.get("/update_location/")
 async def update_location(request: Request):
     global geolocation_data

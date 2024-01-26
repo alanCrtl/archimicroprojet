@@ -1,6 +1,6 @@
-from kafka import KafkaConsumer
 import psycopg2
 from psycopg2 import sql
+from kafka import KafkaConsumer
 
 class Coord:
     def __init__(self, lat, long, ip, date) -> None:
@@ -65,8 +65,7 @@ def get_column_names():
     finally:
         connection.close()
 
-# ==== main functions ====
-# ==== main functions ====
+# ==== main function ====
 def consume_messages(bootstrap_servers, group_id, topic):
 
     consumer_conf = {

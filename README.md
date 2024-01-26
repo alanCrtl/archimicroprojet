@@ -37,7 +37,7 @@
 
 ![AltText](working_at_last.gif)
 
-## Docker 
+## Docker (ran with Docker version 25.0.0)
 
 Go into docker/ and then enter these commands to run services
 
