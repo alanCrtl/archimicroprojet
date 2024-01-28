@@ -9,9 +9,8 @@ services:
         - "8000:8000"
     volumes:
         - ../api:/app
-    command: uvicorn main:app
     networks:
-      - kafka_net
+      - archimicroprojet_kafka_net
 
   kafka-consumer:
     build:
@@ -24,23 +23,23 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: coordonnee
     networks:
-      - kafka_net
+      - archimicroprojet_kafka_net
   
   front :
     build: ../front
     image: kafka_front
     container_name: kafka_front_container
-    port: 
+    ports: 
       - "4200:4200"
     volumes :
       - ../front:/app
     command: ng serve
     networks:
-      - kafka_net
+      - archimicroprojet_kafka_net
     depends_on:
       - api
 
 
 networks:
-  kafka_net:
+  archimicroprojet_kafka_net:
     external: true
