@@ -1,31 +1,42 @@
 # archi micro projet
 
-## kafka broker
-TODO:
+## TODO 
 
-MAKE SURE PRODUCERS CAN PRODUCE IN PARALLEL, NOT THE CASE RIGHT NOW
-try asyncio, 2 producer.py files with different keys, try producing
-in parallel.
+Dockerize everything
+testapi.py api working
+kafka working
+bdd postgresql working
+consumer and producer working
 
-idea: 
-producer -> produce request to websocket -> websocket produce on the 'server' machine
-the 'server' machine has a consumer which can consume the messages and put them 
-in db.
+
+## Schema of structure
+
+![AltText](schema.jpg)
+
+## Kafka
 
 [kafka quickstart guide](https://kafka.apache.org/quickstart)
 
+TODO:
+
 ### Data format sent to topic coordinates
 
-The data is to the broker in the format: lat; long; Date.<br>
-Example: "-48.744897; -78.637573; 2023-12-27 16:03:41" <br>
-This is a full string, so it needs to parsed and converted.
+The data is to the broker in the format: lat; long; Date; ip.<br>
+Example: "-48.744897; -78.637573; 2023-12-27 16:03:41; 172.17.9.135"<br>
 
+### launch broker on 2 terminal (go into kafka folder first)
+```
+bin/zookeeper-server-start.sh config/zookeeper.properties
+```
+```
+bin/kafka-server-start.sh config/server.properties
+``` 
 
-### launch broker on 2 terminal (go into kafka folder first):
-    
-    bin/zookeeper-server-start.sh config/zookeeper.properties
-    
-    bin/kafka-server-start.sh config/server.properties
+### some command if it fails (go into kafka folder)
+
+i needed to do this to install kafka i guess after cloning repo 
+
+    ./gradlew jar -PscalaVersion=2.13.11
 
 ### test messages on 'test-topic'
 
@@ -57,26 +68,52 @@ read:
 
     listeners=PLAINTEXT://localhost:9092
     
-## Database
+## Database POSTGRESQL
 
-Once postgres installed
-go into BDD, and type createdb coords
-if error "role 'name' does not exist" then create a superuser
+Once postgres installed (read requirements.txt)<br>
+go into folder BDD/, and type ```createdb coords```<br>
+if error : "role 'name' does not exist" then create a superuser
 by following instructions below and by replacing cytech by
 your name.
+(to display users: once you type psql type \du)
 
 ### create super user for postgresql
 
     sudo -i -u postgres
     psql
     CREATE USER cytech WITH SUPERUSER CREATEDB CREATEROLE PASSWORD 'password';
-    \q
+    exit
     exit
 
-### create empty database
+### create empty database and restore the database into the empty one
 
     createdb -U cytech coords
-
-### restore database into the empty database
-
     psql -U cytech -d coords -f db_microarchie.dump
+
+## API 
+
+### run api manually
+```
+uvicorn app:app --reload
+```
+
+## Docker 
+
+### Run the docker-compose (postgres, front, kafka)
+Changer l'adresse ip dans le docker-compose.ylm pour celle du pc qui lance la commande
+
+```
+docker-compose up
+```
+
+### Run the producer docker-compose (kafka)
+```
+cd producer
+docker-compose -f producer-docker-compose.yml up
+```
+
+### Run the consumer docker-compose (kafka, api)
+```
+cd consumer
+docker-compose -f consumer-docker-compose.yml up
+```

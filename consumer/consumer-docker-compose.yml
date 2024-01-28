@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  api:
+    build: ../api
+    image: kafka_api
+    container_name: kafka_api_container
+    ports:
+        - "8000:8000"
+    volumes:
+        - ../api:/app
+    command: uvicorn main:app
+    networks:
+      - kafka_net
+
+  kafka-consumer:
+    build:
+      context: ./
+    environment:
+      KAFKA_BROKER: kafka:9092 #change to 29092 when testing with diff pc
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: coordonnee
+    networks:
+      - kafka_net
+
+networks:
+  kafka_net:
+    external: true
