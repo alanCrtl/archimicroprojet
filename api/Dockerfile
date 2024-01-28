@@ -2,9 +2,9 @@ FROM tiangolo/uvicorn-gunicorn-fastapi:python3.10
 
 WORKDIR /app
 
-COPY ./requirements.txt app/api/requirements.txt
+COPY ./requirements.txt ./api/requirements.txt
 
-RUN pip install -r app/api/requirements.txt
+RUN pip install -r ./api/requirements.txt
 
 COPY ./ /app
 
