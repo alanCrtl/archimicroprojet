@@ -2,9 +2,9 @@ FROM tiangolo/uvicorn-gunicorn-fastapi:python3.10
 
 WORKDIR /app
 
-COPY ./requirements.txt /app/api/requirements.txt
+COPY ./requirements.txt /app/requirements.txt
 
-RUN pip install --upgrade pip && pip install -r requirements.txt
+RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf &&  pip install --upgrade pip && pip install -r requirements.txt
 
 COPY ./ /api
 

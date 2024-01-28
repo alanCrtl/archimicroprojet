@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY requirements.txt .
 
-RUN pip install -r requirements.txt
+RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf &&  pip install -r requirements.txt
 
 COPY . .
 
