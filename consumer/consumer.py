@@ -11,49 +11,17 @@ class Coord:
         self.long: float = long
         self.ip: str = ip
         self.date: str = date
-    
-def connect_to_db():
-    dbname = "coords"
-    user = "root"
-    password = "password"
-    host = "localhost"
-    port = "5432"
-    connection = psycopg2.connect(dbname=dbname, user=user, password=password, host=host, port=port)
-    return connection
+
 
 def push_to_db(coord: Coord):
-    connection = connect_to_db()
+    data = {
+       'latitude' : coord.lat,
+        'longitude' : coord.long,
+        'date':coord.date,
+        'ip': coord.ip
+    }
+    requests.post('http://localhost:8000/coordonnees', json=data)
 
-    try:
-        with connection.cursor() as cursor:
-            insert_query = sql.SQL("""
-                INSERT INTO coordonnee (longitude, latitude, date, ip)
-                VALUES (%s, %s, %s, %s)
-            """)
-            cursor.execute(insert_query, (coord.long, coord.lat, coord.date, coord.ip))
-
-        connection.commit()
-
-    finally:
-        connection.close()
-    return {"status": "Message pushed to the database successfully"}
-
-def clear_db():
-    connection = connect_to_db()
-
-    try:
-        with connection.cursor() as cursor:
-            delete_query = sql.SQL("""
-                DELETE FROM coordonnee
-            """)
-            cursor.execute(delete_query)
-
-        connection.commit()
-
-    finally:
-        connection.close()
-    
-    return {"status": "All rows cleared from the database"}
     
 # ==== main functions ====
 def consume_messages(bootstrap_servers, group_id, topic):
@@ -69,8 +37,7 @@ def consume_messages(bootstrap_servers, group_id, topic):
     max_iterations_without_messages = 5
     iterations_without_messages = 0
 
-    # start of clean sheets
-    clear_db()
+
 
     print(f'bootstrapped the consumer to broker and topic [{topic}]; waiting for messages...')
     try:
@@ -106,6 +73,7 @@ def consume_messages(bootstrap_servers, group_id, topic):
             ip = splitted_message[2]
             date = splitted_message[3]
 
+            
             # turn it into object and push to DB
             coord = Coord(lat=lat, long=long, ip=ip, date=date)
             push_to_db(coord)

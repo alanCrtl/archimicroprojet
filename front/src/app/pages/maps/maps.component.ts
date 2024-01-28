@@ -42,7 +42,7 @@ export class MapsComponent implements AfterViewInit{
   }
 
   constructor(private markerService :MarkerService) {
-    const subject = webSocket('ws://127.0.0.1:8000/ws/1');
+    const subject = webSocket('ws://127.0.0.1:8000/ws');
 
     subject.subscribe(
       msg => {

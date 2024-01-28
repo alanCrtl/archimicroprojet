@@ -47,8 +47,8 @@ async def add_coordonnees(coor: Model_coordonnee, connections= Depends(get_conne
     await connections[0].send_json({'latitude': coor.latitude, 'longitude':coor.longitude, 'ip': coor.ip, 'date': coor.date})
     return True
 
-@app.websocket('/ws/{ip}')
-async def websocket_endpoint(websocket: WebSocket, ip:int, connections = Depends(get_connections)):
+@app.websocket('/ws')
+async def websocket_endpoint(websocket: WebSocket, connections = Depends(get_connections)):
     await websocket.accept()
     connections.append(websocket)
     while True:
