@@ -1,11 +1,11 @@
-FROM tiangolo/uvicorn-gunicorn-fastapi:python3.10
+FROM python:3.11
 
 WORKDIR /app
 
-COPY ./requirements.txt /app/requirements.txt
+COPY ./requirements.txt ./api/requirements.txt
 
-RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf &&  pip install --upgrade pip && pip install -r requirements.txt
+RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf &&  pip install -r ./api/requirements.txt
 
-COPY ./ /api
+COPY ./ ./api
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"] 
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
