@@ -1,10 +1,10 @@
-FROM tiangolo/uvicorn-gunicorn-fastapi:python3.10
+FROM python:3.11
 
 WORKDIR /app
 
 COPY ./requirements.txt ./api/requirements.txt
 
-RUN pip install --upgrade pip && pip install -r ./api/requirements.txt
+RUN pip install -r ./api/requirements.txt
 
 COPY ./ ./api
 
