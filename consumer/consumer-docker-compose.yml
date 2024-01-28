@@ -25,6 +25,21 @@ services:
       POSTGRES_DB: coordonnee
     networks:
       - kafka_net
+  
+  front :
+    build: ../front
+    image: kafka_front
+    container_name: kafka_front_container
+    port: 
+      - "4200:4200"
+    volumes :
+      - ../front:/app
+    command: ng serve
+    networks:
+      - kafka_net
+    depends_on:
+      - api
+
 
 networks:
   kafka_net:
