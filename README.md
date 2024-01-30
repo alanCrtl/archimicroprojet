@@ -45,7 +45,7 @@ docker-compose -f consumer-docker-compose.yml up --build
 ```
 
 ### Run producer's docker-compose 
-*Run it while consumer's docker-compose is still "Attaching to consumer_kafka-consumer_1"* 
+*Run it while consumer's docker-compose is still on "Attaching to consumer_kafka-consumer_1"* 
 ![AltText](consumerDockerCompose.png)
 ```
 cd producer/
