@@ -39,6 +39,25 @@ def delivery_report(err, msg):
     else:
         print('Message delivered to {}, partition: [{}]'.format(msg.topic(), msg.partition()))
 
+
+def random_start():
+    coor = [[51.071002,2.5245134], [43.321551, -0.359241], [48.9751103,8.1767166], [42.3332995,2.5277649], [48.4140251,-4.7942741]]
+
+    i = random.randint(0, 4)
+
+    return coor[i][0], coor[i][1]
+
+def go_paris(lat, long):
+    if lat<48.9 and lat>48.7 and long<2.4 and long>2.2 :
+        lat, long = random_start()
+
+    if lat<48.8 : lat = lat+0.05
+    if lat>48.8 : lat = lat-0.05
+    if long<2.3 : long = long+0.05
+    if long>2.3 : long = long-0.05
+
+    return lat, long
+
 def produce_messages(bootstrap_servers, topic, num_messages):
     producer_conf = {
         'bootstrap.servers': bootstrap_servers,
@@ -46,9 +65,10 @@ def produce_messages(bootstrap_servers, topic, num_messages):
 
     producer = Producer(producer_conf)
 
+    lat, long = random_start()
+
     for _ in range(num_messages):
-        lat, long = 43.321551, -0.359241  # start in Pau
-        lat, long = generate_coordinate(lat, long)
+        lat, long = go_paris(lat, long)
         message = generate_message(lat, long)
         partition = get_machine_partition() or 0
 
@@ -56,13 +76,13 @@ def produce_messages(bootstrap_servers, topic, num_messages):
         print(f'Sending message: {message} to partition {partition}')
 
         producer.produce(topic, value=message, partition=partition, callback=delivery_report)
-        time.sleep(5)
+
 
     producer.flush()
 
 if __name__ == '__main__':
     bootstrap_servers = 'kafka:9092'  # docker network inspect archimicroprojet_kafka_net
     topic = 'coordinates'
-    num_messages = 30
+    num_messages = 500
     produce_messages(bootstrap_servers, topic, num_messages)
 
