@@ -20,8 +20,11 @@ def push_to_db(coord: Coord):
         'date':coord.date,
         'ip': coord.ip
     }
-    requests.post('http://localhost:8000/coordonnees', json=data)
-
+    session = requests.Session()
+    session.trust_env = False
+   
+    session.post('http://api:8000/coordonnees', json=data)
+   
     
 # ==== main functions ====
 def consume_messages(bootstrap_servers, group_id, topic):
@@ -34,7 +37,7 @@ def consume_messages(bootstrap_servers, group_id, topic):
     consumer = Consumer(consumer_conf)
     consumer.subscribe([topic])
     
-    max_iterations_without_messages = 5
+    max_iterations_without_messages = 15
     iterations_without_messages = 0
 
 
@@ -67,7 +70,7 @@ def consume_messages(bootstrap_servers, group_id, topic):
             
             # parse message
             print(f'msg received: {msg.value().decode("utf-8")}')
-            splitted_message = msg.value().decode('utf-8').split(';')
+            splitted_message = msg.value().decode('utf-8').split('; ')
             lat = float(splitted_message[0])
             long = float(splitted_message[1])
             ip = splitted_message[2]
