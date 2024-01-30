@@ -1,16 +1,7 @@
 version: '3'
 
 services:
-  api:
-    build: ../api
-    image: kafka_api
-    container_name: kafka_api_container
-    ports:
-        - "8000:8000"
-    volumes:
-        - ../api:/app
-    networks:
-      - archimicroprojet_kafka_net
+
 
   kafka-consumer:
     build:
@@ -24,20 +15,9 @@ services:
       POSTGRES_DB: coordonnee
     networks:
       - archimicroprojet_kafka_net
+    
   
-  front :
-    build: ../front
-    image: kafka_front
-    container_name: kafka_front_container
-    ports: 
-      - "4200:4200"
-    volumes :
-      - ../front:/app
-    command: ng serve --host 0.0.0.0
-    networks:
-      - archimicroprojet_kafka_net
-    depends_on:
-      - api
+ 
 
 
 networks:
