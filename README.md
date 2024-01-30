@@ -153,7 +153,12 @@ read:
 
 ### run api manually
 ```
-uvicorn api:app --reload
+uvicorn main:app --reload
+```
+
+### run front server manually
+```
+  ng serve
 ```
 
 
