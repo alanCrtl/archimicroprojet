@@ -2,7 +2,7 @@ import time
 import random
 import socket
 import hashlib
-from kafka import KafkaProducer
+from confluent_kafka import Producer
 
 NUM_PARTITIONS = 2
 
@@ -41,10 +41,10 @@ def delivery_report(err, msg):
 
 def produce_messages(bootstrap_servers, topic, num_messages):
     producer_conf = {
-        'bootstrap_servers': bootstrap_servers,
+        'bootstrap.servers': bootstrap_servers,
     }
 
-    producer = KafkaProducer(**producer_conf)
+    producer = Producer(producer_conf)
 
     for _ in range(num_messages):
         lat, long = 43.321551, -0.359241  # start in Pau
@@ -55,8 +55,8 @@ def produce_messages(bootstrap_servers, topic, num_messages):
         # Debug print statements
         print(f'Sending message: {message} to partition {partition}')
 
-        producer.send(topic, value=message.encode(), partition=partition).add_callback(delivery_report)
-        time.sleep(1)
+        producer.produce(topic, value=message, partition=partition, callback=delivery_report)
+        time.sleep(5)
 
     producer.flush()
 

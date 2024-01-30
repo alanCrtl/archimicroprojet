@@ -29,13 +29,7 @@
   - [Run API Manually](#run-api-manually)
 - [Auteurs](#auteurs)
 
-## Schema of structure of services
 
-![AltText](schema.jpg)
-
-## Gif of running all services
-
-![AltText](working_at_last.gif)
 
 ## Docker (ran with Docker version 25.0.0)
 
@@ -189,23 +183,7 @@ uvicorn api:app --reload
 
 Aurelien CHAUVEHEID
 
-### Run the docker-compose (postgres, front, api, kafka)
-Changer l'adresse ip dans le docker-compose.ylm pour celle du pc qui lance la commande
 
-```
-docker-compose up
-```
-
-### Run the producer docker-compose (kafka)
-```
-cd producer
-docker-compose -f producer-docker-compose.yml up
-```
-
-### Run the consumer docker-compose (kafka)
-```
-docker-compose -f consumer-docker-compose.yml up
-```
 # AUTEURS 
 
 Aurelien CHAUVEHEID
