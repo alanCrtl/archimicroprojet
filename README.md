@@ -1,15 +1,14 @@
-# archi micro projet
+# Architecture microservices projet
 
 # Table of Contents
 
 - [Schema of Structure of Services](#schema-of-structure-of-services)
 - [Gif of Running All Services](#gif-of-running-all-services)
 - [Docker](#docker)
-  - [Run Kafka](#run-kafka)
-  - [Run PostgreSQL DB](#run-postgresql-db)
-  - [Run API/Frontend Docker-Compose](#run-apifrontend-docker-compose)
-  - [Run Consumer Docker-Compose](#run-consumer-docker-compose)
-  - [Run Producer Docker-Compose](#run-producer-docker-compose)
+  - [Run Kafka](#run-kafka-zookeeper-front-api-and-postgres-bdd)
+  - [Run Consumer Docker-Compose](#run-consumers-docker-compose)
+  - [Run Producer Docker-Compose](#run-producers-docker-compose)
+  - [Delete everything](#to-delete-everything)
   - [Useful Docker Commands for Debug](#useful-docker-commands-for-debug)
 - [Old Documentation (No Docker)](#the-following-sections-are-old-documentation-for-running-things-manually-no-docker-kept-as-archive)
 - [Kafka](#kafka)
@@ -32,68 +31,68 @@
 
 
 ## Docker (ran with Docker version 25.0.0)
+Do this on 3 different terminal on the same computer
 
-Go into docker/ and then enter these commands to run services
-
-### Run kafka
+### Run kafka, zookeeper, front, api and postgres bdd
 ```
-docker-compose -f kafka-docker-compose.yml up --build
-```
-
-### Run the postgreSQL db
-```
-docker-compose -f bdd-docker-compose.yml up --build
+docker-compose up --build
 ```
 
-### Run the api/frontend docker-compose
+### Run consumer's docker-compose
 ```
-docker-compose -f api-docker-compose.yml up --build
-```
-
-### Run the consumer docker-compose
-```
-docker-compose -f docker-compose-consumer.yml up --build
+cd consumer/
+docker-compose -f consumer-docker-compose.yml up --build
 ```
 
-### Run the producer docker-compose
+### Run producer's docker-compose 
+*Run it while consumer's docker-compose is still on "Attaching to consumer_kafka-consumer_1"* 
+![AltText](consumerDockerCompose.png)
 ```
+cd producer/
 docker-compose -f producer-docker-compose.yml up --build
 ```
 
-**Once all services are running you can find the frontend(map) here : http://0.0.0.0:8000**
+
+#### Once all services are running you can find the map here : http://localhost:4200/
+
+### To delete everything 
+```
+ctrl+c on every terminal 
+
+docker-compose -f producer-docker-compose.yml down --rmi all -v
+
+docker-compose -f consumer-docker-compose.yml down --rmi all -v
+
+docker-compose -f docker-compose.yml down --rmi all -v
+```
 
 
-### useful docker commands for debug
-*show containers*
+### Useful docker commands for debug
+*Show containers*
 ```
 docker ps
 ```
-*restart service*
+*Restart service*
 ```
 sudo service docker restart
-
+```
+*Provides detailed information about the network*
+```
+docker network inspect archimicroprojet_kafka_net
 ```
 *Stop a container (example)*
 ```
 docker compose -f bdd-docker-compose.yml down
 ```
-*reset networks*
+*Reset networks*
 ```
 docker network prune
 ```
-*list process that use port*
+*List process that use port*
 ```
 sudo lsof -i :<PORT>
 ```
-*hard reset*
-```
-docker stop $(docker ps -a -q)
-docker rm $(docker ps -a -q)
-docker rmi $(docker images -q)
-docker volume rm $(docker volume ls -q)
-docker network rm $(docker network ls -q)
-docker system prune -a --volumes
-```
+
 
 ## The following sections are old documentation for running things manually (no docker), kept as archive
 
@@ -149,28 +148,6 @@ read:
 ### broker config (in server.properties):
 
     listeners=PLAINTEXT://localhost:9092
-    
-## Database POSTGRESQL
-
-Once postgres installed (read requirements.txt)<br>
-go into folder BDD/, and type ```createdb coords```<br>
-if error : "role 'name' does not exist" then create a superuser
-by following instructions below and by replacing cytech by
-your name.
-(to display users: once you type psql type \du)
-
-### create super user for postgresql
-
-    sudo -i -u postgres
-    psql
-    CREATE USER cytech WITH SUPERUSER CREATEDB CREATEROLE PASSWORD 'password';
-    exit
-    exit
-
-### create empty database and restore the database into the empty one
-
-    createdb -U cytech coords
-    psql -U cytech -d coords -f db_microarchie.dump
 
 ## API 
 
@@ -178,10 +155,6 @@ your name.
 ```
 uvicorn api:app --reload
 ```
-
-# AUTEURS 
-
-Aurelien CHAUVEHEID
 
 
 # AUTEURS 
