@@ -1,0 +1,19 @@
+version: '3'
+services:
+  consumer:
+    build:
+      context: ../consumer
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_DB: coords
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+    networks:
+      - kafkaproj
+    restart: on-failure
+
+networks:
+  kafkaproj:
+    driver: bridge

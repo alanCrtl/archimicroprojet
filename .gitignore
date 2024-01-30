@@ -2,6 +2,8 @@
 venv
 pyvenv.cfg
 kafka-3.6.0-src.tgz
+kafka-3.6.0-src
+archive
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
 # Compiled output

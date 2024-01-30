@@ -1,2 +1,1 @@
-confluent-kafka
-psycopg2-binary
+kafka_python==2.0.2

@@ -2,11 +2,8 @@ import time
 import random
 import socket
 import hashlib
-from confluent_kafka import Producer
-"""
-running this will create test coordinates
-directly to the broker running on local
-"""
+from kafka import KafkaProducer
+
 NUM_PARTITIONS = 2
 
 def generate_coordinate(start_lat, start_long):
@@ -23,12 +20,6 @@ def generate_message(lat, long):
     current_date = time.strftime("%Y-%m-%d %H:%M:%S")
     ip_address = socket.gethostbyname(socket.gethostname())
     return f'{lat}; {long}; {ip_address}; {current_date}'
-    
-def delivery_report(err, msg):
-    if err is not None:
-        print('Message delivery failed: {}'.format(err))
-    else:
-        print('Message delivered to {}, partition: [{}]'.format(msg.topic(), msg.partition()))
 
 def get_machine_partition():
     # Get the machine's IP address
@@ -42,26 +33,36 @@ def get_machine_partition():
 
     return partition
 
+def delivery_report(err, msg):
+    if err is not None:
+        print('Message delivery failed: {}'.format(err))
+    else:
+        print('Message delivered to {}, partition: [{}]'.format(msg.topic(), msg.partition()))
+
 def produce_messages(bootstrap_servers, topic, num_messages):
     producer_conf = {
-        'bootstrap.servers': bootstrap_servers,
+        'bootstrap_servers': bootstrap_servers,
     }
 
-    producer = Producer(producer_conf)
+    producer = KafkaProducer(**producer_conf)
 
     for _ in range(num_messages):
-        lat, long = 43.321551, -0.359241 # start in Pau
+        lat, long = 43.321551, -0.359241  # start in Pau
         lat, long = generate_coordinate(lat, long)
         message = generate_message(lat, long)
-        partition = get_machine_partition()
-        # partition = 0
-        producer.produce(topic, value=message, partition=partition, callback=delivery_report)
-        time.sleep(5)
+        partition = get_machine_partition() or 0
+
+        # Debug print statements
+        print(f'Sending message: {message} to partition {partition}')
+
+        producer.send(topic, value=message.encode(), partition=partition).add_callback(delivery_report)
+        time.sleep(1)
 
     producer.flush()
 
 if __name__ == '__main__':
     bootstrap_servers = 'kafka:9092'  # docker network inspect archimicroprojet_kafka_net
     topic = 'coordinates'
-    num_messages = 10
+    num_messages = 30
     produce_messages(bootstrap_servers, topic, num_messages)
+
