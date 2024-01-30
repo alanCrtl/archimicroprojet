@@ -37,7 +37,7 @@ async def root():
 
 @app.get('/coordonnees/{ip}')
 async def get_coordonnees(ip):
-    coor = db.session.query(Coordonnee).filter(Coordonnee.ip == ip).all()
+    coor = db.session.query(Coordonnee).filter(Coordonnee.ip == ip).order_by(Coordonnee.id.desc()).all()
     return coor
 
 @app.post('/coordonnees')

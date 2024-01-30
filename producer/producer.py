@@ -15,11 +15,16 @@ def generate_coordinate(start_lat, start_long):
     long = start_long + long_delta
     return round(lat, 6), round(long, 6)
 
-def generate_message(lat, long):
+def generate_message(lat, long, ip):
     # Get the current date and time in ISO format
     current_date = time.strftime("%Y-%m-%d %H:%M:%S")
-    ip_address = socket.gethostbyname(socket.gethostname())
-    return f'{lat}; {long}; {ip_address}; {current_date}'
+
+    """
+    if producer could work on different machine :
+        ip_address = socket.gethostbyname(socket.gethostname())
+
+    """
+    return f'{lat}; {long}; {ip}; {current_date}'
 
 def get_machine_partition():
     # Get the machine's IP address
@@ -41,22 +46,27 @@ def delivery_report(err, msg):
 
 
 def random_start():
-    coor = [[51.071002,2.5245134], [43.321551, -0.359241], [48.9751103,8.1767166], [42.3332995,2.5277649], [48.4140251,-4.7942741]]
+    coor = [[51.071002,2.5245134], [43.321551, -0.359241], [48.9751103,8.1767166], [42.3332995,2.5277649], [48.111339 ,-1.6800198]]
 
     i = random.randint(0, 4)
 
     return coor[i][0], coor[i][1]
 
 def go_paris(lat, long):
-    if lat<48.9 and lat>48.7 and long<2.4 and long>2.2 :
-        lat, long = random_start()
+    i = random.random()*0.01
 
-    if lat<48.8 : lat = lat+0.05
-    if lat>48.8 : lat = lat-0.05
-    if long<2.3 : long = long+0.05
-    if long>2.3 : long = long-0.05
+    if lat<48.8 : lat = lat+random.random()*0.01
+    if lat>48.8 : lat = lat-random.random()*0.01
+    if long<2.3 : long = long+random.random()*0.01
+    if long>2.3 : long = long-random.random()*0.01
 
     return lat, long
+
+#generate fake ip to simulate different machine producing
+def generate_ip():
+    i = random.randint(2, 255)
+
+    return f'127.0.0.{i}'
 
 def produce_messages(bootstrap_servers, topic, num_messages):
     producer_conf = {
@@ -64,12 +74,13 @@ def produce_messages(bootstrap_servers, topic, num_messages):
     }
 
     producer = Producer(producer_conf)
+    producer_ip = generate_ip()
 
     lat, long = random_start()
 
     for _ in range(num_messages):
         lat, long = go_paris(lat, long)
-        message = generate_message(lat, long)
+        message = generate_message(lat, long, producer_ip)
         partition = get_machine_partition() or 0
 
         # Debug print statements
@@ -77,12 +88,14 @@ def produce_messages(bootstrap_servers, topic, num_messages):
 
         producer.produce(topic, value=message, partition=partition, callback=delivery_report)
 
+        time.sleep(0.5)
+
 
     producer.flush()
 
 if __name__ == '__main__':
     bootstrap_servers = 'kafka:9092'  # docker network inspect archimicroprojet_kafka_net
     topic = 'coordinates'
-    num_messages = 500
+    num_messages = 300
     produce_messages(bootstrap_servers, topic, num_messages)
 
