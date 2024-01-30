@@ -56,7 +56,7 @@ def produce_messages(bootstrap_servers, topic, num_messages):
         partition = get_machine_partition()
         # partition = 0
         producer.produce(topic, value=message, partition=partition, callback=delivery_report)
-        time.sleep(0.5)
+        time.sleep(5)
 
     producer.flush()
 
