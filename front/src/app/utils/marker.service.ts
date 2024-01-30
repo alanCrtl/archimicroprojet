@@ -18,7 +18,7 @@ export class MarkerService {
   makeMarkers(map: L.Map, point:Point): L.Marker {
     const lon = point.longitude;
     const lat = point.latitude;
-    const marker = L.marker([lon, lat]);
+    const marker = L.marker([lat, lon]);
 
     marker.bindPopup(this.popUpService.makePopUp(point))
     return marker
@@ -45,7 +45,7 @@ export class MarkerService {
       const marker = this.makeMarkers(map, point)
       let points = []
       for(const point of res) {
-        points.push([point.longitude, point.latitude])
+        points.push([point.latitude, point.longitude])
       }
       const path=  this.makePath(map, points)
 

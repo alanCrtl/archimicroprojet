@@ -29,8 +29,8 @@ export class MapsComponent implements AfterViewInit{
 
   private initMap(): void {
     this.map = L.map('map', {
-      center: [ 39.8282, -98.5795 ],
-      zoom: 4
+      center: [ 42.785793,-0.951066],
+      zoom: 6
     });
     const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 18,
@@ -46,7 +46,7 @@ export class MapsComponent implements AfterViewInit{
 
     subject.subscribe(
       msg => {
-        console.log(msg)
+
         const p = msg as Point
         this.markerService.afficherMarkerIP(this.map,p )
       }, // Called whenever there is a message from the server.
