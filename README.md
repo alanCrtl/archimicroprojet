@@ -46,6 +46,7 @@ docker-compose -f consumer-docker-compose.yml up --build
 
 ### Run producer's docker-compose 
 *Run it while consumer's docker-compose is still "Attaching to consumer_kafka-consumer_1"* 
+![AltText](consumerDockerCompose.png)
 ```
 cd producer/
 docker-compose -f producer-docker-compose.yml up --build
