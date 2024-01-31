@@ -21,21 +21,18 @@
   - [List Topics](#list-topics)
   - [Kafka Server Logs](#kafka-server-logs)
   - [Broker Config (in server.properties)](#broker-config-in-serverproperties)
-- [Database PostgreSQL](#database-postgresql)
-  - [Create Super User for PostgreSQL](#create-super-user-for-postgresql)
-  - [Create Empty Database and Restore the Database into the Empty One](#create-empty-database-and-restore-the-database-into-the-empty-one)
 - [API](#api)
   - [Run API Manually](#run-api-manually)
 - [Auteurs](#auteurs)
 
 
 ## Docker (ran with Docker version 25.0.0)
-Do this on 3 different terminal on the same computer
+Do this on 4 different terminal on the same computer
 
 ### Launch front one time for it to work
 
 ```
-cd front
+cd front/
 npm install
 ng serve
 ```
