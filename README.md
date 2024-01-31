@@ -9,6 +9,7 @@
   - [Run Consumer Docker-Compose](#run-consumers-docker-compose)
   - [Run Producer Docker-Compose](#run-producers-docker-compose)
   - [Delete everything](#to-delete-everything)
+  - [If the front doesn't work](#if-the-front-doesnt-work-on-first-try)
   - [Useful Docker Commands for Debug](#useful-docker-commands-for-debug)
 - [Old Documentation (No Docker)](#the-following-sections-are-old-documentation-for-running-things-manually-no-docker-kept-as-archive)
 - [Kafka](#kafka)
@@ -27,17 +28,10 @@
 
 
 ## Docker (ran with Docker version 25.0.0)
-Do this on 4 different terminal on the same computer
-
-### Launch front one time for it to work
-
-```
-cd front/
-npm install
-ng serve
-```
+Do this on 3 different terminal on the same computer
 
 ### Run kafka, zookeeper, front, api and postgres bdd
+In project directory :
 ```
 docker-compose up --build
 ```
@@ -48,17 +42,16 @@ cd consumer/
 docker-compose -f consumer-docker-compose.yml up --build
 ```
 
-### Run producer's docker-compose 
-*Run it while consumer's docker-compose is still on "Attaching to consumer_kafka-consumer_1"* 
+#### You can find the map here : http://localhost:4200/
 
-![AltText](consumerDockerCompose.png)
+### Run producer's docker-compose 
+*Run it while consumer's is still "waiting for messages"* 
+
 ```
 cd producer/
 docker-compose -f producer-docker-compose.yml up --build
 ```
 
-
-#### Once all services are running you can find the map here : http://localhost:4200/
 
 ### Working app
 
@@ -75,6 +68,16 @@ docker-compose -f consumer-docker-compose.yml down --rmi all -v
 docker-compose -f docker-compose.yml down --rmi all -v
 ```
 
+### If the front doesn't work on first try 
+Try :
+```
+cd front/
+npm install
+ng serve
+```
+Stop the front (ctrl + c)
+
+Retry to run the docker-composes
 
 ### Useful docker commands for debug
 *Show containers*
@@ -105,16 +108,16 @@ sudo lsof -i :<PORT>
 
 ## The following sections are old documentation for running things manually (no docker), kept as archive
 
-## Kafka
+### Kafka
 
 [kafka quickstart guide](https://kafka.apache.org/quickstart)
 
-### Data format sent to topic coordinates
+#### Data format sent to topic coordinates
 
 The data is to the broker in the format: lat; long; Date; ip.<br>
 Example: "-48.744897; -78.637573; 2023-12-27 16:03:41; 172.17.9.135"<br>
 
-### launch broker on 2 terminal (go into kafka folder first)
+#### launch broker on 2 terminal (go into kafka folder first)
 ```
 bin/zookeeper-server-start.sh config/zookeeper.properties
 ```
@@ -122,13 +125,13 @@ bin/zookeeper-server-start.sh config/zookeeper.properties
 bin/kafka-server-start.sh config/server.properties
 ``` 
 
-### some command if it fails (go into kafka folder)
+#### some command if it fails (go into kafka folder)
 
 i needed to do this to install kafka i guess after cloning repo 
 
     ./gradlew jar -PscalaVersion=2.13.11
 
-### test messages on 'test-topic'
+#### test messages on 'test-topic'
 
 write: 
 
@@ -138,7 +141,7 @@ read:
 
     bin/kafka-console-consumer.sh --topic test-topic --from-beginning --bootstrap-server localhost:9092
 
-### create topic coordinates (one time only):
+#### create topic coordinates (one time only):
 
     bin/kafka-topics.sh --create --topic coordinates --bootstrap-server localhost:9092 --partitions 2 --replication-factor 1
 
@@ -146,32 +149,32 @@ read:
 
 	bin/kafka-topics.sh --bootstrap-server localhost:9092 --delete --topic coordinates
 
-### list topics
+#### list topics
 
 	kafka-topics.sh --bootstrap-server localhost:9092 --list --command-config /path/to/client.properties
 	
-### kafka server logs:
+#### kafka server logs:
     
     tail -f logs/server.log
 
-### broker config (in server.properties):
+#### broker config (in server.properties):
 
     listeners=PLAINTEXT://localhost:9092
 
-## API 
+### API 
 
-### run api manually
+#### run api manually
 ```
 uvicorn main:app --reload
 ```
 
-### run front server manually
+#### run front server manually
 ```
   ng serve
 ```
 
 
-# AUTEURS 
+## AUTEURS 
 
 Aurelien CHAUVEHEID
 
