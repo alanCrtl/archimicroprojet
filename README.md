@@ -29,9 +29,16 @@
 - [Auteurs](#auteurs)
 
 
-
 ## Docker (ran with Docker version 25.0.0)
 Do this on 3 different terminal on the same computer
+
+### Launch front one time for it to work
+
+```
+cd front
+npm install
+ng serve
+```
 
 ### Run kafka, zookeeper, front, api and postgres bdd
 ```
@@ -54,6 +61,10 @@ docker-compose -f producer-docker-compose.yml up --build
 
 
 #### Once all services are running you can find the map here : http://localhost:4200/
+
+### Working app
+
+![AltText](working.gif)
 
 ### To delete everything 
 ```
