@@ -43,9 +43,6 @@ services:
     container_name: kafka_front_container
     ports: 
       - "4200:4200"
-    volumes :
-      - ./front:/app
-    command: ng serve --host 0.0.0.0
     networks:
       - kafka_net
     depends_on:
