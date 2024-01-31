@@ -2,7 +2,8 @@ import time
 import random
 import socket
 import hashlib
-from confluent_kafka import Producer
+from kafka import KafkaProducer
+
 
 NUM_PARTITIONS = 2
 
@@ -24,7 +25,7 @@ def generate_message(lat, long, ip):
         ip_address = socket.gethostbyname(socket.gethostname())
 
     """
-    return f'{lat}; {long}; {ip}; {current_date}'
+    return f'{lat}; {long}; {ip};{current_date}'
 
 def get_machine_partition():
     # Get the machine's IP address
@@ -70,10 +71,10 @@ def generate_ip():
 
 def produce_messages(bootstrap_servers, topic, num_messages):
     producer_conf = {
-        'bootstrap.servers': bootstrap_servers,
+        'bootstrap_servers': bootstrap_servers,
     }
 
-    producer = Producer(producer_conf)
+    producer = KafkaProducer(**producer_conf)
     producer_ip = generate_ip()
 
     lat, long = random_start()
@@ -86,9 +87,9 @@ def produce_messages(bootstrap_servers, topic, num_messages):
         # Debug print statements
         print(f'Sending message: {message} to partition {partition}')
 
-        producer.produce(topic, value=message, partition=partition, callback=delivery_report)
+        producer.send(topic, value=message.encode(), partition=partition).add_callback(delivery_report)
 
-        time.sleep(0.5)
+        time.sleep(1.5)
 
 
     producer.flush()
