@@ -1,4 +1,4 @@
-confluent-kafka
+kafka_python
 psycopg2-binary
 requests
 httpx
